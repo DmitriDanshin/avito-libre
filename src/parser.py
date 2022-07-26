@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.webdriver import WebDriver
-
+from utils.settings_parser import user_settings
 from api import API
 
 
@@ -15,4 +15,9 @@ class Parser:
         return self.__handled_data
 
     def __handle_data(self):
-        return len(self.__webdriver_response.find_elements(By.CLASS_NAME, "iva-item-content-rejJg"))
+        return len(
+            self.__webdriver_response
+                .find_elements(
+                    By.CLASS_NAME, user_settings['card_class_name']
+                )
+        )

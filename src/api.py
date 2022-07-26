@@ -1,6 +1,5 @@
+from utils.driver import get_driver_path
 from selenium import webdriver
-
-from src.settings import DRIVER_EXECUTABLE_PATH
 
 
 class API:
@@ -9,9 +8,10 @@ class API:
         prefs = {
             "profile.managed_default_content_settings.images": 2
         }
+        print(get_driver_path())
         options.add_experimental_option("prefs", prefs)
         self.driver = webdriver.Chrome(
-            executable_path=DRIVER_EXECUTABLE_PATH,
+            executable_path=get_driver_path(),
             options=options
         )
 
@@ -21,5 +21,3 @@ class API:
 
     def __del__(self):
         self.driver.close()
-
-
