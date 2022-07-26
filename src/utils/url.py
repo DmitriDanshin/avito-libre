@@ -3,7 +3,8 @@ from collections.abc import Mapping
 
 
 class URL:
-    def __init__(self, domain: str, path: str, query: dict):
+    def __init__(self, domain: str, path: str, query: dict[str, str]):
+
         if not isinstance(query, Mapping) or query is None:
             query = {}
 
@@ -11,7 +12,7 @@ class URL:
         self.__query = parse.urlencode(query)
         self.__path = path
 
-    def get_url(self) -> str:
+    def __str__(self):
         return (self
                 .__domain
                 ._replace(path=self.__path, query=self.__query)

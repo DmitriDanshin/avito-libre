@@ -1,7 +1,7 @@
 from sys import platform
 
-DRIVER_EXECUTABLE_PATH_LINUX = "../web_drivers/chromedriver_linux"
-DRIVER_EXECUTABLE_PATH_WIN = "../web_drivers/chromedriver_win.exe"
+DRIVER_EXECUTABLE_PATH_LINUX = "web_drivers/chromedriver"
+DRIVER_EXECUTABLE_PATH_WIN = "web_drivers/chromedriver.exe"
 
 
 def get_driver_path():
