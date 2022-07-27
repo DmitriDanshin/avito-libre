@@ -3,10 +3,12 @@ from collections.abc import Mapping
 
 
 class URL:
-    def __init__(self, domain: str, path: str, query: dict[str, str]):
+    def __init__(self, *, domain: str, path: str, query: dict[str, str] = None):
         if not isinstance(query, Mapping) or query is None:
             query = {}
-
+        if not (domain.startswith('https://') or (domain.startswith('http://'))):
+            raise TypeError('A domain must contain a protocol.')
+        query = {key.lower(): value.lower() for key, value in query.items()}
         self.__domain = parse.urlparse(domain)
         self.__query = parse.urlencode(query)
         self.__path = path
@@ -20,9 +22,25 @@ class URL:
                 )
 
     @property
-    def domain(self):
-        return self.__domain
+    def domain(self) -> str:
+        return self.__domain.geturl()
 
     @domain.setter
-    def domain(self, new_domain: str):
+    def domain(self, new_domain: str) -> None:
         self.__domain = parse.urlparse(new_domain)
+
+    @property
+    def path(self) -> str:
+        return self.__path
+
+    @path.setter
+    def path(self, new_path: str) -> None:
+        self.__path = new_path
+
+    @property
+    def query(self) -> str:
+        return self.__query
+
+    @query.setter
+    def query(self, new_query: dict[str, str]) -> None:
+        self.__query = parse.urlencode(new_query)

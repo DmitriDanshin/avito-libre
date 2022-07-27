@@ -1,6 +1,6 @@
 DOMAIN = "https://www.avito.ru/"
 CITY = "Krasnodar"
-SEARCH = "RTX"
+SEARCH = "rtx"
 CARD_CLASS_NAME = "iva-item-content-rejJg"
 MAIN_CITY_CLASS_NAME = (
     "geo-georeferences-SEtee text-text-LurtD text-size-s-BxGpL"
