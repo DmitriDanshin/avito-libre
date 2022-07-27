@@ -4,7 +4,6 @@ from collections.abc import Mapping
 
 class URL:
     def __init__(self, domain: str, path: str, query: dict[str, str]):
-
         if not isinstance(query, Mapping) or query is None:
             query = {}
 
@@ -19,3 +18,11 @@ class URL:
                 .geturl()
                 .lower()
                 )
+
+    @property
+    def domain(self):
+        return self.__domain
+
+    @domain.setter
+    def domain(self, new_domain: str):
+        self.__domain = parse.urlparse(new_domain)
