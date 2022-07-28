@@ -1,3 +1,5 @@
+DEBUG = True
+
 DOMAIN = "https://www.avito.ru/"
 CITY = "Krasnodar"
 SEARCH = "rtx"
@@ -19,4 +21,12 @@ CARD_LOCATION_CLASS_NAME = (
 CARD_DESCRIPTION_CLASS_NAME = (
     "iva-item-text-Ge6dR iva-item-description-FDgK4 "
     "text-text-LurtD text-size-s-BxGpL"
+)
+CARD_DATE_CLASS_NAME = (
+    "date-text-KmWDf text-text-LurtD "
+    "text-size-s-BxGpL text-color-noaccent-P1Rfs"
+)
+CARD_DATE_POPUP_CLASS_NAME = (
+    "text-text-LurtD text-size-s-BxGpL "
+    "text-color-inverted-ZPNb_"
 )

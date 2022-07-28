@@ -1,6 +1,6 @@
 from sys import platform
 
-DRIVER_EXECUTABLE_PATH_LINUX = "../web_drivers/chromedriver"
+DRIVER_EXECUTABLE_PATH_LINUX = "web_drivers/chromedriver"
 DRIVER_EXECUTABLE_PATH_WIN = "web_drivers/chromedriver.exe"
 
 

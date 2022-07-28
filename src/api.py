@@ -1,3 +1,4 @@
+from src import settings
 from src.settings import DOMAIN, CITY, SEARCH
 from src.utils.driver import get_driver_path
 from selenium import webdriver
@@ -28,4 +29,5 @@ class API:
         return self.driver
 
     def __del__(self):
-        self.driver.close()
+        if not settings.DEBUG:
+            self.driver.close()
