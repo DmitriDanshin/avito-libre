@@ -65,11 +65,6 @@ class TestURL(TestCase):
         url_upper.query = {"q": "Телевизор"}
         self.assertEqual(str(url_lower), str(url_upper))
 
-        # url.query = {"к": "Телевизор"}
-        # self.assertEqual(str(url),
-        #                  "https://озон.ру/бытовая техника?%d0%ba=%d0%a2%d0%b5%d0%bb%d0%b5%d0%b2%d0%b8%d0%b7%d0%be%d1%80"
-        #                  )
-
     def test_url_data_type(self):
         url = URL(
             domain="https://google.com",
@@ -97,28 +92,3 @@ class TestURL(TestCase):
         self.assertEqual(str(url),
                          "https://google.com/map?q=%281%2c+2%29"
                          )
-
-    #     url3 = URL(
-    #         domain="https://'google'.com",
-    #         path="'map'",
-    #         query={
-    #             "q": "'Moscow'"
-    #         }
-    #     )
-    #     url4 = URL(
-    #         domain="FTP://google.com",
-    #         path="map",
-    #         query={
-    #             "q": "Moscow"
-    #         }
-    #     )
-    #
-    # def test_type_checking(self):
-    #     url5 = URL(
-    #         domain="[https://yandex.ru]",
-    #         path="{fifa}",
-    #         query={
-    #             "q": '12312'
-    #         }
-    #     )
-    #
