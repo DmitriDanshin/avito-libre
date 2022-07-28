@@ -72,8 +72,8 @@ class Parser:
 
     def __get_date(self, class_name, card_element):
         date_element: WebElement = self.__webdriver.execute_script(
-            f"return arguments[0]"
-            f".getElementsByClassName(arguments[1])[0];",
+            "return arguments[0]"
+            ".getElementsByClassName(arguments[1])[0];",
             card_element, class_name
         )
         if date_element is None:
@@ -82,9 +82,9 @@ class Parser:
 
     def __get_url_from_card_element(self, card_element: WebElement):
         return self.__webdriver.execute_script(
-            f"return arguments[0]"
-            f".querySelector('a')"
-            f".href;", card_element
+            "return arguments[0]"
+            ".querySelector('a')"
+            ".href;", card_element
         )
 
     def __get_element_text_by_class_name(self, class_name: str, element: WebElement) -> str:
