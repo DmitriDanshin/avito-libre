@@ -1,5 +1,4 @@
 from src import settings
-from src.settings import DOMAIN, CITY, SEARCH
 from src.utils.driver import get_driver_path
 from selenium import webdriver
 from src.utils.url import URL
@@ -17,14 +16,7 @@ class API:
             options=options
         )
 
-    def get(self):
-        url = URL(
-            domain=DOMAIN,
-            path=CITY,
-            query={
-                "q": SEARCH
-            }
-        )
+    def get(self, url: URL):
         self.driver.get(str(url))
         return self.driver
 

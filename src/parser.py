@@ -1,25 +1,37 @@
 from typing import Iterator
 
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.common import JavascriptException
+
+from src import settings
+from src.utils.date_handler import DateHandler
 from selenium.webdriver.common.by import By
 
-from src.utils.date_handler import DateHandler
+from src.utils.script_handler import ScriptHandler
+from src.utils.url import URL
+from api import API
+
 from src.settings import (
-    CARD_CLASS_NAME, MAIN_CITY_CLASS_NAME,
+    DOMAIN, CITY, SEARCH,
+    CARD_CLASS_NAME, MAIN_CONTAINER_CLASS,
     CARD_TITLE_CLASS_NAME, CARD_PRICE_CLASS_NAME,
     CARD_LOCATION_CLASS_NAME, CARD_DESCRIPTION_CLASS_NAME,
-    CARD_DATE_CLASS_NAME, CARD_DATE_POPUP_CLASS_NAME
+    CARD_DATE_CLASS_NAME, CARD_DATE_POPUP_CLASS_NAME,
+    PAGINATOR_CLASS_NAME, PAGINATOR_ITEM_CLASS_NAME,
+    PAGINATOR_FIRST_ITEM_INDEX, PAGINATOR_LAST_ITEM_INDEX
 )
-
-from api import API
 
 
 class Parser:
     def __init__(self):
+        self.__url = URL(
+            domain=DOMAIN,
+            path=CITY,
+            query={
+                "q": SEARCH,
+            }
+        )
         self.__api = API()
-        self.__webdriver: WebDriver = self.__api.get()
         self.__handled_data = self.__handle_data()
 
     @property
@@ -27,12 +39,12 @@ class Parser:
         return self.__handled_data
 
     def __click_to_all_card_dates(self, class_date_name, elements):
-        with open("scripts/simulation_mouse_click.js", "r") as scripts:
-            scripts = scripts.read()
-            for element in elements:
-                self.__webdriver.execute_script(
-                    scripts, element, class_date_name
-                )
+        # "scripts/simulation_mouse_click.js"
+        scripts = ScriptHandler.read()
+        for element in elements:
+            self.__webdriver.execute_script(
+                scripts, element, class_date_name
+            )
 
     def __make_card_data(self, card_element: WebElement) -> dict[str, str]:
         return {
@@ -90,9 +102,9 @@ class Parser:
     def __get_element_text_by_class_name(self, class_name: str, element: WebElement) -> str:
         try:
             return self.__webdriver.execute_script(
-                f"return arguments[0]"
-                f".getElementsByClassName('{class_name}')[0]"
-                f".textContent;", element
+                "return arguments[0]"
+                ".getElementsByClassName('arguments[1]')[0]"
+                ".textContent;", element, class_name
             )
         except JavascriptException:
             return ""
@@ -104,18 +116,51 @@ class Parser:
         )
 
     def __make_cards_data(self, elements: list[WebElement]) -> Iterator[dict[str, str]]:
-        return (
-            self.__make_card_data(card_element) for card_element in elements
-            if MAIN_CITY_CLASS_NAME in self.__get_element_inner_html(card_element)
-        )
+        return {
+            (card_data := self.__make_card_data(card_element))['url']: card_data
+            for card_element in elements
+        }
 
-    def __handle_data(self) -> Iterator[dict[str, str]]:
+    def __get_pagination_range(self) -> range:
+        self.__webdriver = self.__api.get(self.__url)
+        paginator_element = self.__webdriver.find_element(
+            By.CLASS_NAME,
+            PAGINATOR_CLASS_NAME
+        )
+        paginator_items = paginator_element.find_elements(
+            By.CLASS_NAME,
+            PAGINATOR_ITEM_CLASS_NAME
+        )
+        first_page = int(
+            paginator_items[PAGINATOR_FIRST_ITEM_INDEX].text
+        ) if not settings.DEBUG else 1
+        last_page = int(
+            paginator_items[PAGINATOR_LAST_ITEM_INDEX].text
+        ) if not settings.DEBUG else 1
+
+        return range(first_page, last_page + 1)
+
+    def __handle_data(self):
+        data = {}
+        for i in self.__get_pagination_range():
+            data |= self.__handle_page_data(i)
+        return data
+
+    def __handle_page_data(self, page: int) -> Iterator[dict[str, str]]:
+        self.__url.query['p'] = str(page)
+        self.__webdriver = self.__api.get(self.__url)
+
         elements = (
             self.__webdriver
+            .find_element(By.CLASS_NAME, MAIN_CONTAINER_CLASS)
             .find_elements(
                 By.CLASS_NAME, CARD_CLASS_NAME
             )
         )
-        self.__click_to_all_card_dates(CARD_DATE_CLASS_NAME, elements)
+
+        self.__click_to_all_card_dates(
+            CARD_DATE_CLASS_NAME,
+            elements
+        )
 
         return self.__make_cards_data(elements)

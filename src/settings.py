@@ -1,11 +1,11 @@
 DEBUG = True
 
 DOMAIN = "https://www.avito.ru/"
-CITY = "Krasnodar"
-SEARCH = "rtx"
+CITY = "Krasnodar/avtomobili/"
+SEARCH = "Daewoo Matiz"
 CARD_CLASS_NAME = "iva-item-content-rejJg"
-MAIN_CITY_CLASS_NAME = (
-    "geo-georeferences-SEtee text-text-LurtD text-size-s-BxGpL"
+MAIN_CONTAINER_CLASS = (
+    "items-items-kAJAg"
 )
 CARD_TITLE_CLASS_NAME = (
     "title-root-zZCwT iva-item-title-py3i_ "
@@ -30,3 +30,11 @@ CARD_DATE_POPUP_CLASS_NAME = (
     "text-text-LurtD text-size-s-BxGpL "
     "text-color-inverted-ZPNb_"
 )
+PAGINATOR_CLASS_NAME = (
+    "pagination-root-Ntd_O"
+)
+PAGINATOR_ITEM_CLASS_NAME = (
+    "pagination-item-JJq_j"
+)
+PAGINATOR_FIRST_ITEM_INDEX = 1
+PAGINATOR_LAST_ITEM_INDEX = -2

@@ -6,5 +6,5 @@ class App:
         self.__parser = Parser()
 
     def run(self):
-        data = list(self.__parser.data)
+        data = self.__parser.data
         print(len(data), data)

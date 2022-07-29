@@ -10,13 +10,13 @@ class URL:
             raise TypeError('A domain must contain a protocol.')
         query = {key.lower(): value.lower() for key, value in query.items()}
         self.__domain = parse.urlparse(domain)
-        self.__query = parse.urlencode(query)
+        self.__query = query
         self.__path = path
 
     def __str__(self):
         return (self
                 .__domain
-                ._replace(path=self.__path, query=self.__query)
+                ._replace(path=self.__path, query=parse.urlencode(self.__query))
                 .geturl()
                 .lower()
                 )
@@ -38,9 +38,9 @@ class URL:
         self.__path = new_path
 
     @property
-    def query(self) -> str:
+    def query(self) -> dict[str, str]:
         return self.__query
 
     @query.setter
     def query(self, new_query: dict[str, str]) -> None:
-        self.__query = parse.urlencode(new_query)
+        self.__query = new_query
