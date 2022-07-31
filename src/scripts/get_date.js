@@ -1,1 +1,0 @@
-return arguments[0].getElementsByClassName(arguments[1])[0];
