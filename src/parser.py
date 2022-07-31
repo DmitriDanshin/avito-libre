@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Iterator
 
 from selenium.webdriver.remote.webelement import WebElement
@@ -39,8 +40,7 @@ class Parser:
         return self.__handled_data
 
     def __click_to_all_card_dates(self, class_date_name, elements):
-        # "scripts/simulation_mouse_click.js"
-        scripts = ScriptHandler.read()
+        scripts = ScriptHandler.read(Path("simulation_mouse_click.js"))
         for element in elements:
             self.__webdriver.execute_script(
                 scripts, element, class_date_name
@@ -83,36 +83,33 @@ class Parser:
         return DateHandler.reformat_date(date)
 
     def __get_date(self, class_name, card_element):
+        script = ScriptHandler.read(Path("get_date.js"))
         date_element: WebElement = self.__webdriver.execute_script(
-            "return arguments[0]"
-            ".getElementsByClassName(arguments[1])[0];",
-            card_element, class_name
+            script, card_element, class_name
         )
         if date_element is None:
             return date_element
         return self.__handle_date(date_element.text)
 
     def __get_url_from_card_element(self, card_element: WebElement):
+        script = ScriptHandler.read(Path("get_url_from_card.js"))
         return self.__webdriver.execute_script(
-            "return arguments[0]"
-            ".querySelector('a')"
-            ".href;", card_element
+            script, card_element
         )
 
     def __get_element_text_by_class_name(self, class_name: str, element: WebElement) -> str:
+        script = ScriptHandler.read(Path("get_element_text.js"))
         try:
             return self.__webdriver.execute_script(
-                "return arguments[0]"
-                ".getElementsByClassName('arguments[1]')[0]"
-                ".textContent;", element, class_name
+                script, element, class_name
             )
         except JavascriptException:
             return ""
 
     def __get_element_inner_html(self, element: WebElement):
+        script = ScriptHandler.read(Path("get_element_inner.js"))
         return self.__webdriver.execute_script(
-            "return arguments[0].innerHTML;",
-            element
+            script, element
         )
 
     def __make_cards_data(self, elements: list[WebElement]) -> Iterator[dict[str, str]]:
@@ -152,10 +149,8 @@ class Parser:
 
         elements = (
             self.__webdriver
-            .find_element(By.CLASS_NAME, MAIN_CONTAINER_CLASS)
-            .find_elements(
-                By.CLASS_NAME, CARD_CLASS_NAME
-            )
+                .find_element(By.CLASS_NAME, MAIN_CONTAINER_CLASS)
+                .find_elements(By.CLASS_NAME, CARD_CLASS_NAME)
         )
 
         self.__click_to_all_card_dates(
