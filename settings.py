@@ -1,8 +1,8 @@
-DEBUG = False
+DEBUG = True
 
 DOMAIN = "https://www.avito.ru/"
 CITY = "Krasnodar/avtomobili/"
-SEARCH = "Daewoo Matiz"
+SEARCH = "rtx"
 CARD_CLASS_NAME = "iva-item-content-rejJg"
 MAIN_CONTAINER_CLASS = (
     "items-items-kAJAg"
@@ -38,3 +38,7 @@ PAGINATOR_ITEM_CLASS_NAME = (
 )
 PAGINATOR_FIRST_ITEM_INDEX = 1
 PAGINATOR_LAST_ITEM_INDEX = -2
+FILENAME_TIME_FORMAT = '%Y-%m-%d-%Hh%Mm%Ss'
+CSV_DELIMITER = ','
+FILE_ENCODING = 'utf-8'
+FORCE_ASCII = False
