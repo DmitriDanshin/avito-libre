@@ -10,12 +10,12 @@ from settings import (
 
 
 class Writer:
-    def __init__(self):
-        self.__result_folder = Path("results")
+    __result_folder: Path = Path("results")
 
-    def clear(self):
-        for file in os.listdir(self.__result_folder):
-            file_path = os.path.join(self.__result_folder, file)
+    @classmethod
+    def clear(cls):
+        for file in os.listdir(cls.__result_folder):
+            file_path = os.path.join(cls.__result_folder, file)
             if os.path.isfile(file_path):
                 os.unlink(file_path)
 

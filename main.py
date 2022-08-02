@@ -1,6 +1,7 @@
 from app import App
-
-app = App()
+from argparser import ArgParser
 
 if __name__ == '__main__':
-    app.run()
+    app = App()
+    arguments_parser = ArgParser()
+    app.run(arguments_parser.formats_to_save)
