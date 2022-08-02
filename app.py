@@ -14,8 +14,6 @@ class App:
         self.__writer.save_xlsx(data)
         self.__writer.save_xml(data)
         self.__writer.save_json(data)
-
-        # todo сделать метод clear, который очищает папку results
         # self.__writer.clear()
         while settings.DEBUG:
             ...
