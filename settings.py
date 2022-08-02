@@ -42,3 +42,7 @@ FILENAME_TIME_FORMAT = '%Y-%m-%d-%Hh%Mm%Ss'
 CSV_DELIMITER = ','
 FILE_ENCODING = 'utf-8'
 FORCE_ASCII = False
+
+BOT_TOKEN = (
+    ""
+)
