@@ -3,6 +3,8 @@ DEBUG = True
 DOMAIN = "https://www.avito.ru/"
 CITY = "Krasnodar/avtomobili/"
 SEARCH = "rtx"
+
+
 CARD_CLASS_NAME = "iva-item-content-rejJg"
 MAIN_CONTAINER_CLASS = (
     "items-items-kAJAg"
@@ -44,5 +46,10 @@ FILE_ENCODING = 'utf-8'
 FORCE_ASCII = False
 
 BOT_TOKEN = (
-    ""
+    "5392761074:AAHytW_V5DSotxW54klAHPeK6ts8zY6SNTo"
 )
+
+TELEGRAM_USERNAME_MAX_LENGTH = 32
+
+PRODUCT_CITY_MAX_LENGTH = 25
+PRODUCT_NAME_MAX_LENGTH = 200
