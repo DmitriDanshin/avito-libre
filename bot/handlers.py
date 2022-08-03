@@ -1,4 +1,7 @@
-from bot.controllers import add_product, remove_product, tracked, initialize_user, get_all_products
+from bot.controllers import (
+    add_product, remove_product,
+    initialize_user, get_all_products
+)
 from functools import partial
 from telebot import types
 import telebot

@@ -33,6 +33,7 @@ def remove_product(message: types.Message, bot: telebot.TeleBot):
     if product is None:
         bot.send_message(message.chat.id, "Объявление не найдено")
     else:
+        # Product.delete(product)
         session.delete(product)
         session.commit()
         bot.send_message(
