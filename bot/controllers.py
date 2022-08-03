@@ -1,9 +1,6 @@
-from telebot import types
-import telebot
+from telebot import types, TeleBot
 
-from bot.models import TelegramUser, Product, session
-
-tracked = []
+from bot.models import TelegramUser, Product
 
 
 def get_all_products(user_id: int) -> str:
@@ -18,47 +15,39 @@ def initialize_user(message: types.Message):
     username = message.from_user.username
 
     if TelegramUser.get_by_id(user_id) is None:
-        user = TelegramUser(
-            id=user_id, username=username
-        )
+        TelegramUser.create(user_id=user_id, username=username)
 
-        session.add(user)
-        session.commit()
-
-    session.close()
+    TelegramUser.close_session()
 
 
-def remove_product(message: types.Message, bot: telebot.TeleBot):
+def remove_product(message: types.Message, bot: TeleBot):
     product = Product.get_by_name(message.text)
     if product is None:
         bot.send_message(message.chat.id, "Объявление не найдено")
     else:
-        # Product.delete(product)
-        session.delete(product)
-        session.commit()
+        Product.delete(product)
         bot.send_message(
             message.chat.id,
-            f"Объявление с текстом {message.text} "
-            f"успешно удалено. "
+            f"Объявление с текстом *{message.text}* "
+            f"успешно удалено\. "
             f"Теперь Вы отслеживаете "
-            f"{get_all_products(user_id=message.from_user.id)}"
+            f"{get_all_products(user_id=message.from_user.id)}",
+            parse_mode='MarkdownV2'
         )
 
 
-def add_product(message: types.Message, bot: telebot.TeleBot):
-    product = Product(
+def add_product(message: types.Message, bot: TeleBot):
+    Product.create(
         user_id=message.from_user.id,
-        name=message.text.strip().lower(),
+        name=message.text,
         city="Krasnodar"
     )
 
-    session.add(product)
-    session.commit()
-
     bot.send_message(
         message.chat.id,
-        f"Объявление с текстом {message.text} "
-        f"успешно добавлено. "
+        f"Объявление с текстом *{message.text}* "
+        f"успешно добавлено\. "
         f"Теперь Вы отслеживаете: "
-        f"{get_all_products(user_id=message.from_user.id)}"
+        f"*{get_all_products(user_id=message.from_user.id)}*",
+        parse_mode='MarkdownV2'
     )
