@@ -53,3 +53,8 @@ def add_product(message: types.Message, bot: TeleBot):
             f"*{get_all_products(user_id=message.from_user.id)}*",
             parse_mode='MarkdownV2'
         )
+    else:
+        bot.send_message(
+            message.chat.id,
+            "Вы не можете."
+        )

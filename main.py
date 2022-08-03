@@ -1,14 +1,9 @@
 from argparser import ArgParser
-from datetime import datetime
 from bot.base import bot
 from app import App
 
 
 def init_bot():
-    print(
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S\t|"),
-        "Bot launched successfully"
-    )
     bot.polling()
 
 
