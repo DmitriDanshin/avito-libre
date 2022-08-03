@@ -61,13 +61,18 @@ class Product(Base):
 
     @staticmethod
     def create(user_id: int, name: str, city: str = 'Krasnodar'):
-        product = Product(
-            user_id=user_id,
-            name=name.strip().lower(),
-            city=city
-        )
-        session.add(product)
-        session.commit()
+        name = name.strip().lower()
+
+        if name not in ExcludedProducts.as_set():
+            product = Product(
+                user_id=user_id,
+                name=name,
+                city=city
+            )
+            session.add(product)
+            session.commit()
+            return product
+
 
     @staticmethod
     def get_by_name(name: str):
@@ -75,8 +80,29 @@ class Product(Base):
             session.query(Product).filter_by(name=name.strip().lower()).first()
         )
 
-    @staticmethod
-    def get_all_products_by_user_id(user_id: int):
+    @classmethod
+    def get_all_products_by_user_id(cls, user_id: int):
         return (
             session.query(Product).filter_by(user_id=user_id)
         )
+
+    @classmethod
+    def count_user_products(cls, user_id: int) -> int:
+        return cls.get_all_products_by_user_id(user_id).count()
+
+
+class ExcludedProducts(Base):
+    __tablename__ = 'excluded_products'
+    id = Column(
+        Integer, primary_key=True, autoincrement=True
+    )
+    name = Column(
+        String(PRODUCT_NAME_MAX_LENGTH)
+    )
+
+    @staticmethod
+    def as_set() -> set:
+        return {
+            excluded_product.name for excluded_product
+            in session.query(ExcludedProducts).all()
+        }

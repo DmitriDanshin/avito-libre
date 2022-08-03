@@ -27,10 +27,12 @@ def start(message: types.Message, bot: telebot.TeleBot):
 
 
 def menu(message: types.Message, bot: telebot.TeleBot):
+    user_id = message.from_user.id
+    chat_id = message.chat.id
     match message.text:
         case "Добавить объявление":
             sent = bot.send_message(
-                message.chat.id,
+                chat_id,
                 text="Введите название объявления, "
                      "которое нужно добавить:",
             )
@@ -38,11 +40,11 @@ def menu(message: types.Message, bot: telebot.TeleBot):
                 sent, partial(add_product, bot=bot)
             )
         case "Удалить объявление":
-            if not Product.get_all_products_by_user_id(message.from_user.id).count():
-                bot.send_message(message.chat.id, "Нечего удалять")
+            if not Product.count_user_products(user_id):
+                bot.send_message(chat_id, "Нечего удалять")
             else:
                 sent = bot.send_message(
-                    message.chat.id,
+                    chat_id,
                     text="Введите название объявления, "
                          "которое нужно удалить:",
                 )
@@ -51,6 +53,6 @@ def menu(message: types.Message, bot: telebot.TeleBot):
                 )
         case "Посмотреть отслеживаемые объявления":
             bot.send_message(
-                message.chat.id,
-                text=get_all_products(message.from_user.id)
+                chat_id,
+                text=get_all_products(user_id)
             )

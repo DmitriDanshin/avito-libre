@@ -1,6 +1,5 @@
-from telebot import types, TeleBot
-
 from bot.models import TelegramUser, Product
+from telebot import types, TeleBot
 
 
 def get_all_products(user_id: int) -> str:
@@ -15,7 +14,10 @@ def initialize_user(message: types.Message):
     username = message.from_user.username
 
     if TelegramUser.get_by_id(user_id) is None:
-        TelegramUser.create(user_id=user_id, username=username)
+        TelegramUser.create(
+            user_id=user_id,
+            username=username
+        )
 
     TelegramUser.close_session()
 
@@ -37,17 +39,17 @@ def remove_product(message: types.Message, bot: TeleBot):
 
 
 def add_product(message: types.Message, bot: TeleBot):
-    Product.create(
+    product = Product.create(
         user_id=message.from_user.id,
         name=message.text,
         city="Krasnodar"
     )
-
-    bot.send_message(
-        message.chat.id,
-        f"Объявление с текстом *{message.text}* "
-        f"успешно добавлено\. "
-        f"Теперь Вы отслеживаете: "
-        f"*{get_all_products(user_id=message.from_user.id)}*",
-        parse_mode='MarkdownV2'
-    )
+    if product:
+        bot.send_message(
+            message.chat.id,
+            f"Объявление с текстом *{product.name}* "
+            f"успешно добавлено\. "
+            f"Теперь Вы отслеживаете: "
+            f"*{get_all_products(user_id=message.from_user.id)}*",
+            parse_mode='MarkdownV2'
+        )
