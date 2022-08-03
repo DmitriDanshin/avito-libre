@@ -1,7 +1,10 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
-
 from db import get_session
-from settings import TELEGRAM_USERNAME_MAX_LENGTH, PRODUCT_CITY_MAX_LENGTH, PRODUCT_NAME_MAX_LENGTH
+from settings import (
+    TELEGRAM_USERNAME_MAX_LENGTH,
+    PRODUCT_CITY_MAX_LENGTH,
+    PRODUCT_NAME_MAX_LENGTH
+)
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -20,10 +23,20 @@ class TelegramUser(Base):
     @staticmethod
     def get_by_id(user_id: int):
         return (
-            session
-            .query(TelegramUser)
-            .get(user_id)
+            session.query(TelegramUser).get(user_id)
         )
+
+    @staticmethod
+    def create(user_id: int, username: str) -> None:
+        user = TelegramUser(
+            id=user_id, username=username
+        )
+        session.add(user)
+        session.commit()
+
+    @staticmethod
+    def close_session():
+        session.close()
 
 
 class Product(Base):
@@ -42,17 +55,28 @@ class Product(Base):
     )
 
     @staticmethod
+    def delete(product: 'Product') -> None:
+        session.delete(product)
+        session.commit()
+
+    @staticmethod
+    def create(user_id: int, name: str, city: str = 'Krasnodar'):
+        product = Product(
+            user_id=user_id,
+            name=name.strip().lower(),
+            city=city
+        )
+        session.add(product)
+        session.commit()
+
+    @staticmethod
     def get_by_name(name: str):
         return (
-            session
-            .query(Product)
-            .filter_by(name=name.strip().lower()).first()
+            session.query(Product).filter_by(name=name.strip().lower()).first()
         )
 
     @staticmethod
     def get_all_products_by_user_id(user_id: int):
         return (
-            session
-            .query(Product)
-            .filter_by(user_id=user_id)
+            session.query(Product).filter_by(user_id=user_id)
         )

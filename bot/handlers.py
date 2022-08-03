@@ -38,7 +38,7 @@ def menu(message: types.Message, bot: telebot.TeleBot):
                 sent, partial(add_product, bot=bot)
             )
         case "Удалить объявление":
-            if not len(list(Product.get_all_products_by_user_id(message.from_user.id))):
+            if not Product.get_all_products_by_user_id(message.from_user.id).count():
                 bot.send_message(message.chat.id, "Нечего удалять")
             else:
                 sent = bot.send_message(
