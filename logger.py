@@ -27,6 +27,7 @@ app_logger = setup_logger('APP', Path('logs/app.log'))
 bot_logger = setup_logger('BOT', Path('logs/bot.log'))
 writer_logger = setup_logger('WRITER', Path('logs/writer.log'))
 parser_logger = setup_logger('PARSER', Path('logs/parser.log'))
+queue_logger = setup_logger('QUEUE', Path('logs/queue.log'))
 
 
 

@@ -8,19 +8,23 @@ class App:
         app_logger.info("App initialized successfully.")
 
     @staticmethod
-    def run(args: dict[str, bool]) -> None:
+    def parse(args: dict[str, bool], product_name: str) -> list[str] | None:
+        writer = Writer(product_name)
+        if args.get("clear", None):
+            writer.clear()
+            return
 
-        if args["clear"]:
-            Writer.clear()
-            return None
+        data = Parser(product_name).data
 
-        data = Parser().data
+        filenames = []
 
-        if args["csv"]:
-            Writer.save_csv(data)
-        if args["xlsx"]:
-            Writer.save_xlsx(data)
-        if args["xml"]:
-            Writer.save_xml(data)
-        if args["json"]:
-            Writer.save_json(data)
+        if args.get("csv", None):
+            filenames.append(writer.save_csv(data))
+        if args.get("xlsx", None):
+            filenames.append(writer.save_xlsx(data))
+        if args.get("xml", None):
+            filenames.append(writer.save_xml(data))
+        if args.get("json", None):
+            filenames.append(writer.save_json(data))
+
+        return filenames

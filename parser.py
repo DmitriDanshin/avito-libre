@@ -24,12 +24,12 @@ from settings import (
 
 
 class Parser:
-    def __init__(self):
+    def __init__(self, search: str = SEARCH):
         self.__url = URL(
             domain=DOMAIN,
             path=CITY,
             query={
-                "q": SEARCH,
+                "q": search,
             }
         )
         self.__api = API()

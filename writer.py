@@ -14,6 +14,9 @@ from settings import (
 class Writer:
     __result_folder: Path = Path("results")
 
+    def __init__(self, product_name: str = SEARCH):
+        self.__product_name = product_name
+
     @classmethod
     def clear(cls):
         for file in os.listdir(cls.__result_folder):
@@ -22,43 +25,41 @@ class Writer:
                 os.unlink(file_path)
         writer_logger.info("Successfully clear a folder results.")
 
-    @staticmethod
-    def __get_filename(extension: Literal['json', 'xml', 'csv', 'xlsx'],
+    def __get_filename(self, extension: Literal['json', 'xml', 'csv', 'xlsx'],
                        data: dict[str, dict[str, str | datetime]]) -> Path:
         return Path(
-            f"search[{'_'.join(SEARCH.lower().split())}]_"
+            f"search[{'_'.join(self.__product_name.lower().split())}]_"
             f"len[{len(data)}]_"
             f"date[{datetime.now().strftime(FILENAME_TIME_FORMAT)}].{extension}"
         )
 
-    @classmethod
-    def __get_data_frame(cls, data: dict[str, dict[str, str | datetime]]) -> pd.DataFrame:
+    @staticmethod
+    def __get_data_frame(data: dict[str, dict[str, str | datetime]]) -> pd.DataFrame:
         return pd.DataFrame(data.values())
 
-    @classmethod
-    def save_json(cls, data: dict[str, dict[str, str | datetime]]):
-        file_name = cls.__get_filename(extension='json', data=data)
-        df = cls.__get_data_frame(data)
-        df.to_json(cls.__result_folder / file_name, force_ascii=FORCE_ASCII)
+    def save_json(self, data: dict[str, dict[str, str | datetime]]) -> str:
+        file_name = self.__get_filename(extension='json', data=data)
+        df = self.__get_data_frame(data)
+        df.to_json(self.__result_folder / file_name, force_ascii=FORCE_ASCII)
         writer_logger.info("Successfully saved data as json format.")
+        return str(file_name)
 
-    @classmethod
-    def save_xml(cls, data: dict[str, dict[str, str | datetime]]):
-        file_name = cls.__get_filename(extension='xml', data=data)
-        df = cls.__get_data_frame(data)
-        df.to_xml(cls.__result_folder / file_name, encoding=FILE_ENCODING)
+    def save_xml(self, data: dict[str, dict[str, str | datetime]]) -> str:
+        file_name = self.__get_filename(extension='xml', data=data)
+        df = self.__get_data_frame(data)
+        df.to_xml(self.__result_folder / file_name, encoding=FILE_ENCODING)
         writer_logger.info("Successfully saved data as xml format.")
+        return str(file_name)
 
-    @classmethod
-    def save_csv(cls, data: dict[str, dict[str, str | datetime]]) -> None:
-        file_name = cls.__get_filename(extension='csv', data=data)
-        df = cls.__get_data_frame(data)
-        df.to_csv(cls.__result_folder / file_name, CSV_DELIMITER, encoding=FILE_ENCODING)
+    def save_csv(self, data: dict[str, dict[str, str | datetime]]) -> str:
+        file_name = self.__get_filename(extension='csv', data=data)
+        df = self.__get_data_frame(data)
+        df.to_csv(self.__result_folder / file_name, CSV_DELIMITER, encoding=FILE_ENCODING)
         writer_logger.info("Successfully saved data as csv format.")
-
-    @classmethod
-    def save_xlsx(cls, data: dict[str, dict[str, str | datetime]]):
-        file_name = cls.__get_filename(extension='xlsx', data=data)
-        df = cls.__get_data_frame(data)
-        df.to_excel(cls.__result_folder / file_name, encoding=FILE_ENCODING)
+        return str(file_name)
+    def save_xlsx(self, data: dict[str, dict[str, str | datetime]]) -> str:
+        file_name = self.__get_filename(extension='xlsx', data=data)
+        df = self.__get_data_frame(data)
+        df.to_excel(self.__result_folder / file_name, encoding=FILE_ENCODING)
         writer_logger.info("Successfully saved data as xlsx format.")
+        return str(file_name)

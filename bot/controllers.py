@@ -1,6 +1,10 @@
 from bot.models import TelegramUser, Product
 from telebot import types, TeleBot
+
+from bot.tasks import register_product
+from db_redis import redis
 from logger import bot_logger
+from rq import Queue
 
 
 def get_all_products(user_id: int) -> str:
@@ -26,7 +30,9 @@ def initialize_user(message: types.Message) -> None:
             username=username
         )
 
-        bot_logger.info(f"Telegram User {message.from_user.username} has been registered.")
+        bot_logger.info(
+            f"Telegram User {message.from_user.username} has been registered."
+        )
 
     TelegramUser.close_session()
 
@@ -74,6 +80,10 @@ def add_product(message: types.Message, bot: TeleBot) -> None:
             f"have added a product {message.text} "
             f"with id = {product.id}"
         )
+
+        queue = Queue(connection=redis)
+        queue.enqueue(register_product, product.name)
+
     else:
         bot.send_message(
             message.chat.id,

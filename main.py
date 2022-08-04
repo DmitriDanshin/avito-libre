@@ -11,8 +11,4 @@ def init_bot():
 
 if __name__ == '__main__':
     arguments_parser = ArgParser()
-    if not arguments_parser.args['noapp']:
-        app = App()
-        app.run(arguments_parser.args)
-
     init_bot()

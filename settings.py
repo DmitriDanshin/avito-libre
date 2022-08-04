@@ -4,7 +4,6 @@ DOMAIN = "https://www.avito.ru/"
 CITY = "Krasnodar"
 SEARCH = "rtx"
 
-
 CARD_CLASS_NAME = "iva-item-content-rejJg"
 MAIN_CONTAINER_CLASS = (
     "items-items-kAJAg"
@@ -52,3 +51,7 @@ PRODUCT_NAME_MAX_LENGTH = 200
 LOGGER_FORMAT = (
     '[%(asctime)s: %(name)s | %(levelname)s] %(message)s'
 )
+
+PRODUCT_FILE_NAME_MAX_LENGTH = 150
+
+CRAB = "🦀"
