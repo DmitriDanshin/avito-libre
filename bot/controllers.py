@@ -1,15 +1,22 @@
 from bot.models import TelegramUser, Product
 from telebot import types, TeleBot
+from logger import bot_logger
 
 
 def get_all_products(user_id: int) -> str:
     products_names = [
         product.name for product in Product.get_all_products_by_user_id(user_id)
     ]
+
+    bot_logger.info(
+        f"Telegram User {TelegramUser.get_by_id(user_id).username} "
+        f"get all products ({Product.count_user_products(user_id)})"
+    )
+
     return ", ".join(products_names) or "Ничего не найдено"
 
 
-def initialize_user(message: types.Message):
+def initialize_user(message: types.Message) -> None:
     user_id = message.from_user.id
     username = message.from_user.username
 
@@ -19,10 +26,12 @@ def initialize_user(message: types.Message):
             username=username
         )
 
+        bot_logger.info(f"Telegram User {message.from_user.username} has been registered.")
+
     TelegramUser.close_session()
 
 
-def remove_product(message: types.Message, bot: TeleBot):
+def remove_product(message: types.Message, bot: TeleBot) -> None:
     product = Product.get_by_name(message.text)
     if product is None:
         bot.send_message(message.chat.id, "Объявление не найдено")
@@ -37,13 +46,20 @@ def remove_product(message: types.Message, bot: TeleBot):
             parse_mode='MarkdownV2'
         )
 
+        bot_logger.info(
+            f"Telegram User {message.from_user.username} "
+            f"have deleted a product {message.text} "
+            f"with id = {product.id}"
+        )
 
-def add_product(message: types.Message, bot: TeleBot):
+
+def add_product(message: types.Message, bot: TeleBot) -> None:
     product = Product.create(
         user_id=message.from_user.id,
         name=message.text,
         city="Krasnodar"
     )
+
     if product:
         bot.send_message(
             message.chat.id,
@@ -52,6 +68,11 @@ def add_product(message: types.Message, bot: TeleBot):
             f"Теперь Вы отслеживаете: "
             f"*{get_all_products(user_id=message.from_user.id)}*",
             parse_mode='MarkdownV2'
+        )
+        bot_logger.info(
+            f"Telegram User {message.from_user.username} "
+            f"have added a product {message.text} "
+            f"with id = {product.id}"
         )
     else:
         bot.send_message(

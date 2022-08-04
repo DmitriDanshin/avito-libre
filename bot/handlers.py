@@ -7,16 +7,23 @@ from telebot import types
 import telebot
 
 from bot.models import Product
+from logger import bot_logger
 
 
 def start(message: types.Message, bot: telebot.TeleBot):
+    bot_logger.info(
+        f"Telegram User {message.from_user.username} started a conversation with bot."
+    )
+
     initialize_user(message)
+
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     add_product_button = types.KeyboardButton("Добавить объявление")
     delete_product_button = types.KeyboardButton("Удалить объявление")
     show_products_button = types.KeyboardButton("Посмотреть отслеживаемые объявления")
     markup.row(add_product_button, delete_product_button)
     markup.row(show_products_button)
+
     bot.send_message(
         message.chat.id,
         text=f"Привет, {message.from_user.first_name}! "
@@ -29,6 +36,7 @@ def start(message: types.Message, bot: telebot.TeleBot):
 def menu(message: types.Message, bot: telebot.TeleBot):
     user_id = message.from_user.id
     chat_id = message.chat.id
+
     match message.text:
         case "Добавить объявление":
             sent = bot.send_message(

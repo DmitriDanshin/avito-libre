@@ -5,6 +5,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.common import JavascriptException
 
 import settings
+from logger import parser_logger
 from utils.date_handler import DateHandler
 from selenium.webdriver.common.by import By
 
@@ -14,8 +15,7 @@ from api import API
 
 from settings import (
     DOMAIN, CITY, SEARCH,
-    CARD_CLASS_NAME, MAIN_CONTAINER_CLASS,
-    CARD_TITLE_CLASS_NAME, CARD_PRICE_CLASS_NAME,
+    CARD_CLASS_NAME, MAIN_CONTAINER_CLASS, CARD_PRICE_CLASS_NAME,
     CARD_LOCATION_CLASS_NAME, CARD_DESCRIPTION_CLASS_NAME,
     CARD_DATE_CLASS_NAME, CARD_DATE_POPUP_CLASS_NAME,
     PAGINATOR_CLASS_NAME, PAGINATOR_ITEM_CLASS_NAME,
@@ -48,10 +48,9 @@ class Parser:
 
     def __make_card_data(self, card_element: WebElement) -> dict[str, str]:
         return {
-            "title": self.__get_element_text_by_class_name(
-                CARD_TITLE_CLASS_NAME,
-                card_element
-            ),
+            "title": card_element.find_element(By.TAG_NAME, "h3").text
+            .replace("\n", ' ')
+            .replace("\xa0", ' '),
             "price": (
                 self.__get_element_text_by_class_name(
                     CARD_PRICE_CLASS_NAME,
@@ -103,7 +102,8 @@ class Parser:
             return self.__webdriver.execute_script(
                 script, element, class_name
             )
-        except JavascriptException:
+        except JavascriptException as je:
+            parser_logger.warning(je.msg)
             return ""
 
     def __get_element_inner_html(self, element: WebElement):
@@ -128,19 +128,20 @@ class Parser:
             By.CLASS_NAME,
             PAGINATOR_ITEM_CLASS_NAME
         )
-        first_page = int(
+        self.__first_page = int(
             paginator_items[PAGINATOR_FIRST_ITEM_INDEX].text
         ) if not settings.DEBUG else 1
-        last_page = int(
+        self.__last_page = int(
             paginator_items[PAGINATOR_LAST_ITEM_INDEX].text
         ) if not settings.DEBUG else 1
 
-        return range(first_page, last_page + 1)
+        return range(self.__first_page, self.__last_page + 1)
 
     def __handle_data(self):
         data = {}
         for i in self.__get_pagination_range():
             data |= self.__handle_page_data(i)
+            parser_logger.info(f"Successfully parsed page {i}/{self.__last_page}.")
         return data
 
     def __handle_page_data(self, page: int) -> Iterator[dict[str, str]]:
@@ -149,8 +150,8 @@ class Parser:
 
         elements = (
             self.__webdriver
-                .find_element(By.CLASS_NAME, MAIN_CONTAINER_CLASS)
-                .find_elements(By.CLASS_NAME, CARD_CLASS_NAME)
+            .find_element(By.CLASS_NAME, MAIN_CONTAINER_CLASS)
+            .find_elements(By.CLASS_NAME, CARD_CLASS_NAME)
         )
 
         self.__click_to_all_card_dates(

@@ -1,18 +1,13 @@
 DEBUG = True
 
 DOMAIN = "https://www.avito.ru/"
-CITY = "Krasnodar/avtomobili/"
+CITY = "Krasnodar"
 SEARCH = "rtx"
 
 
 CARD_CLASS_NAME = "iva-item-content-rejJg"
 MAIN_CONTAINER_CLASS = (
     "items-items-kAJAg"
-)
-CARD_TITLE_CLASS_NAME = (
-    "title-root-zZCwT iva-item-title-py3i_ "
-    "title-listRedesign-_rejR title-root_maxHeight-X6PsH "
-    "text-text-LurtD text-size-s-BxGpL text-bold-SinUO"
 )
 CARD_PRICE_CLASS_NAME = (
     "price-text-_YGDY text-text-LurtD text-size-s-BxGpL"
@@ -53,3 +48,7 @@ TELEGRAM_USERNAME_MAX_LENGTH = 32
 
 PRODUCT_CITY_MAX_LENGTH = 25
 PRODUCT_NAME_MAX_LENGTH = 200
+
+LOGGER_FORMAT = (
+    '[%(asctime)s: %(name)s | %(levelname)s] %(message)s'
+)

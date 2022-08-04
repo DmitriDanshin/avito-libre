@@ -21,7 +21,7 @@ class TelegramUser(Base):
     products = relationship("Product")
 
     @staticmethod
-    def get_by_id(user_id: int):
+    def get_by_id(user_id: int) -> "TelegramUser":
         return (
             session.query(TelegramUser).get(user_id)
         )
@@ -72,7 +72,6 @@ class Product(Base):
             session.add(product)
             session.commit()
             return product
-
 
     @staticmethod
     def get_by_name(name: str):
