@@ -1,6 +1,5 @@
 from argparser import ArgParser
 from bot.base import bot
-from app import App
 from logger import bot_logger
 
 

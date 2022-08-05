@@ -3,7 +3,7 @@ from telebot import types, TeleBot
 
 from bot.tasks import register_product
 from db_redis import redis
-from logger import bot_logger
+from logger import bot_logger, queue_logger
 from rq import Queue
 
 
@@ -83,6 +83,9 @@ def add_product(message: types.Message, bot: TeleBot) -> None:
 
         queue = Queue(connection=redis)
         queue.enqueue(register_product, product.name)
+        queue_logger.info(
+            f"A product {product.name} has been added to the queue."
+        )
 
     else:
         bot.send_message(
