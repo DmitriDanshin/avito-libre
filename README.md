@@ -8,7 +8,6 @@
 Mozilla Firefox 103.0.1 (64-bit)
 python >= 3.10
 Redis >= 6.0.16
-
 ```
 
 ## Особенности
