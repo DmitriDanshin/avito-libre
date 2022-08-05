@@ -29,5 +29,4 @@ class API:
         return self.driver
 
     def __del__(self):
-        if not settings.DEBUG:
-            self.driver.close()
+        self.driver.close()
