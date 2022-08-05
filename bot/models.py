@@ -1,6 +1,7 @@
-from typing import Union, Iterable
+from datetime import datetime
+from typing import Union, Iterable, Any
 
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, asc
 from db import get_session
 from settings import (
     TELEGRAM_USERNAME_MAX_LENGTH,
@@ -53,6 +54,10 @@ class ProductFile(Base):
         Integer, ForeignKey("products.id")
     )
 
+    updated_at = Column(
+        DateTime, default=datetime.now
+    )
+
     @staticmethod
     def add_many(product_filenames: Iterable["ProductFile"]) -> None:
         session.add_all(product_filenames)
@@ -65,6 +70,23 @@ class ProductFile(Base):
             .query(ProductFile)
             .filter_by(product_id=product_id)
         )
+
+    @staticmethod
+    def create_or_update(name: str, product_id: int):
+        product_file = session.query(ProductFile).filter_by(product_id=product_id).first()
+        if product_file is None:
+            product_file = ProductFile(
+                name=name, product_id=product_id
+            )
+            session.add(product_file)
+            session.commit()
+            return product_file
+        else:
+            session.query(ProductFile).filter_by(product_id=product_id).update({
+                "updated_at": datetime.now()
+            })
+            session.commit()
+            return product_file
 
 
 class Product(Base):
@@ -83,6 +105,25 @@ class Product(Base):
     )
 
     files = relationship("ProductFile")
+
+    @staticmethod
+    def get_last_n(n: int = 5) -> list[Any]:
+        return (
+            session
+            .query(Product)
+            .join(ProductFile, Product.files)
+            .order_by(asc(ProductFile.updated_at))
+            .limit(n)
+            .all()
+        )
+
+    @staticmethod
+    def count():
+        return (
+            session
+            .query(Product)
+            .count()
+        )
 
     @staticmethod
     def delete(product: "Product") -> None:

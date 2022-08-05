@@ -1,8 +1,8 @@
 from bot.models import TelegramUser, Product
 from telebot import types, TeleBot
 
-from bot.tasks import register_product
-from db_redis import redis
+from bot.tasks import parse_product
+from db_redis import redis, scheduler
 from logger import bot_logger, queue_logger
 from rq import Queue
 
@@ -54,7 +54,7 @@ def remove_product(message: types.Message, bot: TeleBot) -> None:
 
         bot_logger.info(
             f"Telegram User {message.from_user.username} "
-            f"have deleted a product {message.text} "
+            f"has deleted a product {message.text} "
             f"with id = {product.id}"
         )
 
@@ -81,8 +81,9 @@ def add_product(message: types.Message, bot: TeleBot) -> None:
             f"with id = {product.id}"
         )
 
-        queue = Queue(connection=redis)
-        queue.enqueue(register_product, product.name)
+        queue = Queue("default", connection=redis)
+        queue.enqueue(parse_product, product.name)
+
         queue_logger.info(
             f"A product {product.name} has been added to the queue."
         )

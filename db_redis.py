@@ -1,4 +1,6 @@
 from redis import Redis, AuthenticationError, ConnectionPool
+from rq_scheduler import Scheduler
+
 from logger import queue_logger
 
 try:
@@ -8,6 +10,7 @@ try:
         f"Redis client initialized successfully. "
         f"Redis version == {redis.info()['redis_version']}"
     )
+    scheduler = Scheduler(connection=redis)
 except AuthenticationError:
     queue_logger.critical(
         f"Redis cannot connect to the server. Authentication required."

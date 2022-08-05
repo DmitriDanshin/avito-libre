@@ -1,4 +1,4 @@
-DEBUG = False
+DEBUG = True
 
 DOMAIN = "https://www.avito.ru/"
 CITY = "Krasnodar"
