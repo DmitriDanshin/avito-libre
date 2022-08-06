@@ -52,7 +52,7 @@ rq worker --with-scheduler
 ```
 rqscheduler
 ```
-6. тесты:
+6. Запуск тестов:
 ```
 python -m unittest discover tests
 ```
