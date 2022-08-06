@@ -52,6 +52,9 @@ rq worker --with-scheduler
 ```
 rqscheduler
 ```
-
+6. тесты:
+```
+python -m unittest discover tests
+```
 
 
