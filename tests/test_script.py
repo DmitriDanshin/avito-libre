@@ -8,11 +8,11 @@ class TestScript(TestCase):
 
     def test_exist(self):
         with self.assertRaises(FileNotFoundError):
-            ScriptHandler.read(Path('biba.js'))
+            ScriptHandler.read(Path('tests/scripts/biba.js'))
         with self.assertRaises(FileNotFoundError):
-            ScriptHandler.read(Path('get_date.js'))
+            ScriptHandler.read(Path('tests/scripts/get_date.js'))
         with self.assertRaises(FileNotFoundError):
-            ScriptHandler.read(Path('scripts/get_date.js'))
+            ScriptHandler.read(Path('tests/scripts/get.js'))
 
     def test_correct(self):
         with self.assertRaises(ValueError):
@@ -25,7 +25,7 @@ class TestScript(TestCase):
     def test_read_correct(self):
         self.assertEqual(
             "console.log('hello world')",
-            ScriptHandler.read(Path('hello.js'))
+            ScriptHandler.read(Path('tests/scripts/hello.js'))
         )
 
     def test_type(self):

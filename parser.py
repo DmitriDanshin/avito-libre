@@ -40,7 +40,7 @@ class Parser:
         return self.__handled_data
 
     def __click_to_all_card_dates(self, class_date_name, elements):
-        scripts = ScriptHandler.read(Path("simulation_mouse_click.js"))
+        scripts = ScriptHandler.read(Path("scripts/simulation_mouse_click.js"))
         for element in elements:
             self.__webdriver.execute_script(
                 scripts, element, class_date_name
@@ -82,7 +82,7 @@ class Parser:
         return DateHandler.reformat_date(date)
 
     def __get_date(self, class_name, card_element):
-        script = ScriptHandler.read(Path("get_date.js"))
+        script = ScriptHandler.read(Path("scripts/get_date.js"))
         date_element: WebElement = self.__webdriver.execute_script(
             script, card_element, class_name
         )
@@ -91,13 +91,13 @@ class Parser:
         return self.__handle_date(date_element.text)
 
     def __get_url_from_card_element(self, card_element: WebElement):
-        script = ScriptHandler.read(Path("get_url_from_card.js"))
+        script = ScriptHandler.read(Path("scripts/get_url_from_card.js"))
         return self.__webdriver.execute_script(
             script, card_element
         )
 
     def __get_element_text_by_class_name(self, class_name: str, element: WebElement) -> str:
-        script = ScriptHandler.read(Path("get_element_text.js"))
+        script = ScriptHandler.read(Path("scripts/get_element_text.js"))
         try:
             return self.__webdriver.execute_script(
                 script, element, class_name
@@ -107,7 +107,7 @@ class Parser:
             return ""
 
     def __get_element_inner_html(self, element: WebElement):
-        script = ScriptHandler.read(Path("get_element_inner.js"))
+        script = ScriptHandler.read(Path("scripts/get_element_inner.js"))
         return self.__webdriver.execute_script(
             script, element
         )
