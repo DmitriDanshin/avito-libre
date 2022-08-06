@@ -11,10 +11,21 @@ from settings import (
 from sqlalchemy.orm import declarative_base, relationship, Query
 
 Base = declarative_base()
-session = get_session()
 
 
-class TelegramUser(Base):
+class SessionCore:
+    session = get_session()
+
+    @classmethod
+    def change_session(cls, new_session):
+        cls.session = new_session
+
+    @classmethod
+    def close_session(cls):
+        cls.session.close()
+
+
+class TelegramUser(Base, SessionCore):
     __tablename__ = 'telegram_users'
     id = Column(Integer, primary_key=True)
     username = Column(
@@ -23,26 +34,32 @@ class TelegramUser(Base):
     )
     products = relationship("Product")
 
-    @staticmethod
-    def get_by_id(user_id: int) -> "TelegramUser":
+    @classmethod
+    def get_by_id(cls, user_id: int) -> Union["TelegramUser", None]:
         return (
-            session.query(TelegramUser).get(user_id)
+            cls.session.query(TelegramUser).get(user_id)
         )
 
-    @staticmethod
-    def create(user_id: int, username: str) -> None:
+    @classmethod
+    def create(cls, user_id: int, username: str):
         user = TelegramUser(
             id=user_id, username=username
         )
-        session.add(user)
-        session.commit()
+        cls.session.add(user)
+        cls.session.commit()
+        return user
 
-    @staticmethod
-    def close_session():
-        session.close()
+    @classmethod
+    def all(cls) -> list["TelegramUser"]:
+        return cls.session.query(TelegramUser).all()
+
+    def __eq__(self, other: "TelegramUser"):
+        return all(
+            (self.username == other.username, self.id == other.id)
+        )
 
 
-class ProductFile(Base):
+class ProductFile(Base, SessionCore):
     __tablename__ = 'products_files'
     id = Column(
         Integer, primary_key=True, autoincrement=True
@@ -58,13 +75,13 @@ class ProductFile(Base):
         DateTime, default=datetime.now
     )
 
-    @staticmethod
-    def add_many(product_filenames: Iterable["ProductFile"]) -> None:
-        session.add_all(product_filenames)
-        session.commit()
+    @classmethod
+    def create_many(cls, product_filenames: Iterable["ProductFile"]) -> None:
+        cls.session.add_all(product_filenames)
+        cls.session.commit()
 
     @staticmethod
-    def get_all_files_by_product_id(product_id: id) -> Query:
+    def get_all_files_by_product_id(product_id: int) -> Query:
         return (
             session
             .query(ProductFile)

@@ -31,7 +31,7 @@ def parse_product(product_name: str):
         for product_filename in filenames
     )
 
-    ProductFile.add_many(product_filenames)
+    ProductFile.create_many(product_filenames)
 
 
 def add_to_parse_queue():
