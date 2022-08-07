@@ -80,33 +80,48 @@ class ProductFile(Base, SessionCore):
         cls.session.add_all(product_filenames)
         cls.session.commit()
 
-    @staticmethod
-    def get_all_files_by_product_id(product_id: int) -> Query:
+    @classmethod
+    def get_all_files_by_product_id(cls, product_id: int) -> Query:
         return (
-            session
-            .query(ProductFile)
-            .filter_by(product_id=product_id)
+            cls.session
+                .query(ProductFile)
+                .filter_by(product_id=product_id)
         )
 
-    @staticmethod
-    def create_or_update(name: str, product_id: int):
-        product_file = session.query(ProductFile).filter_by(product_id=product_id).first()
+    @classmethod
+    def create(cls, name: str, product_id: int) -> "ProductFile":
+        product_file = ProductFile(
+            name=name, product_id=product_id
+        )
+        cls.session.add(product_file)
+        cls.session.commit()
+        return product_file
+
+    @classmethod
+    def update(cls, product_id: int) -> "ProductFile":
+        product_file = (cls.session.query(ProductFile).
+                        filter_by(product_id=product_id).
+                        first()
+                        )
+        cls.session.query(ProductFile).filter_by(product_id=product_id).update({
+            "updated_at": datetime.now()
+        })
+        cls.session.commit()
+        return product_file
+
+    @classmethod
+    def create_or_update(cls, name: str, product_id: int):
+        product_file = (cls.session.query(ProductFile).
+                        filter_by(product_id=product_id).
+                        first()
+                        )
         if product_file is None:
-            product_file = ProductFile(
-                name=name, product_id=product_id
-            )
-            session.add(product_file)
-            session.commit()
-            return product_file
+            cls.create(name=name, product_id=product_id)
         else:
-            session.query(ProductFile).filter_by(product_id=product_id).update({
-                "updated_at": datetime.now()
-            })
-            session.commit()
-            return product_file
+            cls.update(product_id=product_id)
 
 
-class Product(Base):
+class Product(Base, SessionCore):
     __tablename__ = 'products'
     id = Column(
         Integer, primary_key=True, autoincrement=True
@@ -123,32 +138,32 @@ class Product(Base):
 
     files = relationship("ProductFile")
 
-    @staticmethod
-    def get_last_n(n: int = 5) -> list[Any]:
+    @classmethod
+    def get_last_n(cls, n: int = 5) -> list[Any]:
         return (
-            session
-            .query(Product)
-            .join(ProductFile, Product.files)
-            .order_by(asc(ProductFile.updated_at))
-            .limit(n)
-            .all()
+            cls.session
+                .query(Product)
+                .join(ProductFile, Product.files)
+                .order_by(asc(ProductFile.updated_at))
+                .limit(n)
+                .all()
         )
 
-    @staticmethod
-    def count():
+    @classmethod
+    def count(cls):
         return (
-            session
-            .query(Product)
-            .count()
+            cls.session
+                .query(Product)
+                .count()
         )
 
-    @staticmethod
-    def delete(product: "Product") -> None:
-        session.delete(product)
-        session.commit()
+    @classmethod
+    def delete(cls, product: "Product") -> None:
+        cls.session.delete(product)
+        cls.session.commit()
 
-    @staticmethod
-    def create(user_id: int, name: str, city: str = 'Krasnodar') -> Union["Product", None]:
+    @classmethod
+    def create(cls, user_id: int, name: str, city: str = 'Krasnodar') -> Union["Product", None]:
         name = name.strip().lower()
 
         if name not in ExcludedProducts.as_set():
@@ -157,25 +172,25 @@ class Product(Base):
                 name=name,
                 city=city
             )
-            session.add(product)
-            session.commit()
+            cls.session.add(product)
+            cls.session.commit()
             return product
 
-    @staticmethod
-    def get_by_name(name: str) -> "Product":
+    @classmethod
+    def get_by_name(cls, name: str) -> "Product":
         return (
-            session
-            .query(Product)
-            .filter_by(name=name.strip().lower())
-            .first()
+            cls.session
+                .query(Product)
+                .filter_by(name=name.strip().lower())
+                .first()
         )
 
     @classmethod
     def get_all_products_by_user_id(cls, user_id: int) -> Query:
         return (
-            session
-            .query(Product)
-            .filter_by(user_id=user_id)
+            cls.session
+                .query(Product)
+                .filter_by(user_id=user_id)
         )
 
     @classmethod
@@ -183,7 +198,7 @@ class Product(Base):
         return cls.get_all_products_by_user_id(user_id).count()
 
 
-class ExcludedProducts(Base):
+class ExcludedProducts(Base, SessionCore):
     __tablename__ = 'excluded_products'
     id = Column(
         Integer, primary_key=True, autoincrement=True
@@ -192,9 +207,9 @@ class ExcludedProducts(Base):
         String(PRODUCT_NAME_MAX_LENGTH)
     )
 
-    @staticmethod
-    def as_set() -> set[str]:
+    @classmethod
+    def as_set(cls) -> set[str]:
         return {
             excluded_product.name for excluded_product
-            in session.query(ExcludedProducts).all()
+            in cls.session.query(ExcludedProducts).all()
         }
