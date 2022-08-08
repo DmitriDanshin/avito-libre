@@ -57,6 +57,7 @@ class Writer:
         df.to_csv(self.__result_folder / file_name, CSV_DELIMITER, encoding=FILE_ENCODING)
         writer_logger.info("Successfully saved data as csv format.")
         return str(file_name)
+
     def save_xlsx(self, data: dict[str, dict[str, str | datetime]]) -> str:
         file_name = self.__get_filename(extension='xlsx', data=data)
         df = self.__get_data_frame(data)
