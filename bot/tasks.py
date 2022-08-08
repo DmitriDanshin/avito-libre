@@ -3,7 +3,7 @@ from datetime import datetime
 from rq_scheduler import Scheduler
 
 from app import App
-from bot.models import ProductFile, Product
+from bot.models import Product
 
 from db_redis import redis
 from logger import queue_logger
@@ -18,24 +18,18 @@ def parse_product(product_name: str):
         product_name
     )
 
+    Product.update_filename(
+        new_filename=filenames[0],
+        product_name=product_name
+    )
+
     queue_logger.info(
         f"Product with name {product_name} "
         f"successfully registered"
     )
 
-    product_filenames = (
-        ProductFile.create_or_update(
-            name=product_filename,
-            product_id=Product.get_by_name(product_name).id
-        )
-        for product_filename in filenames
-    )
-
-    ProductFile.create_many(product_filenames)
-
 
 def add_to_parse_queue():
-
     products = {
         product.name for product in Product.get_last_n(5)
     }

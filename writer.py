@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from pathlib import Path
 import os
@@ -17,12 +18,20 @@ class Writer:
     def __init__(self, product_name: str = SEARCH):
         self.__product_name = product_name
 
-    @classmethod
-    def clear(cls):
-        for file in os.listdir(cls.__result_folder):
-            file_path = os.path.join(cls.__result_folder, file)
-            if os.path.isfile(file_path):
+    def clear(self):
+        for file in os.listdir(self.__result_folder):
+            file_path = os.path.join(self.__result_folder, file)
+            file_exists = os.path.isfile(file_path)
+
+            product_name_in_file_name = (
+                re
+                .compile(rf"\[{self.__product_name}]")
+                .search(str(file))
+            )
+
+            if file_exists and product_name_in_file_name:
                 os.unlink(file_path)
+
         writer_logger.info("Successfully clear a folder results.")
 
     def __get_filename(self, extension: Literal['json', 'xml', 'csv', 'xlsx'],
@@ -52,11 +61,13 @@ class Writer:
         return str(file_name)
 
     def save_csv(self, data: dict[str, dict[str, str | datetime]]) -> str:
+        self.clear()
         file_name = self.__get_filename(extension='csv', data=data)
         df = self.__get_data_frame(data)
         df.to_csv(self.__result_folder / file_name, CSV_DELIMITER, encoding=FILE_ENCODING)
         writer_logger.info("Successfully saved data as csv format.")
         return str(file_name)
+
     def save_xlsx(self, data: dict[str, dict[str, str | datetime]]) -> str:
         file_name = self.__get_filename(extension='xlsx', data=data)
         df = self.__get_data_frame(data)
