@@ -59,68 +59,6 @@ class TelegramUser(Base, SessionCore):
         )
 
 
-class ProductFile(Base, SessionCore):
-    __tablename__ = 'products_files'
-    id = Column(
-        Integer, primary_key=True, autoincrement=True
-    )
-    name = Column(
-        String(PRODUCT_FILE_NAME_MAX_LENGTH)
-    )
-    product_id = Column(
-        Integer, ForeignKey("products.id")
-    )
-
-    updated_at = Column(
-        DateTime, default=datetime.now
-    )
-
-    @classmethod
-    def create_many(cls, product_filenames: Iterable["ProductFile"]) -> None:
-        cls.session.add_all(product_filenames)
-        cls.session.commit()
-
-    @classmethod
-    def get_all_files_by_product_id(cls, product_id: int) -> Query:
-        return (
-            cls.session
-                .query(ProductFile)
-                .filter_by(product_id=product_id)
-        )
-
-    @classmethod
-    def create(cls, name: str, product_id: int) -> "ProductFile":
-        product_file = ProductFile(
-            name=name, product_id=product_id
-        )
-        cls.session.add(product_file)
-        cls.session.commit()
-        return product_file
-
-    @classmethod
-    def update(cls, product_id: int) -> "ProductFile":
-        product_file = (cls.session.query(ProductFile).
-                        filter_by(product_id=product_id).
-                        first()
-                        )
-        cls.session.query(ProductFile).filter_by(product_id=product_id).update({
-            "updated_at": datetime.now()
-        })
-        cls.session.commit()
-        return product_file
-
-    @classmethod
-    def create_or_update(cls, name: str, product_id: int):
-        product_file = (cls.session.query(ProductFile).
-                        filter_by(product_id=product_id).
-                        first()
-                        )
-        if product_file is None:
-            cls.create(name=name, product_id=product_id)
-        else:
-            cls.update(product_id=product_id)
-
-
 class Product(Base, SessionCore):
     __tablename__ = 'products'
     id = Column(
@@ -135,26 +73,37 @@ class Product(Base, SessionCore):
     user_id = Column(
         Integer, ForeignKey("telegram_users.id")
     )
+    updated_at = Column(
+        DateTime, default=datetime.now
+    )
+    filename = Column(
+        String(PRODUCT_FILE_NAME_MAX_LENGTH)
+    )
 
-    files = relationship("ProductFile")
+    @classmethod
+    def update_filename(cls, new_filename: str, product_name: str):
+        cls.session.query(Product).filter_by(name=product_name).update({
+            "filename": new_filename,
+            "updated_at": datetime.now()
+        })
+        cls.session.commit()
 
     @classmethod
     def get_last_n(cls, n: int = 5) -> list[Any]:
         return (
             cls.session
-                .query(Product)
-                .join(ProductFile, Product.files)
-                .order_by(asc(ProductFile.updated_at))
-                .limit(n)
-                .all()
+            .query(Product)
+            .order_by(asc(cls.updated_at))
+            .limit(n)
+            .all()
         )
 
     @classmethod
     def count(cls):
         return (
             cls.session
-                .query(Product)
-                .count()
+            .query(Product)
+            .count()
         )
 
     @classmethod
@@ -180,17 +129,26 @@ class Product(Base, SessionCore):
     def get_by_name(cls, name: str) -> "Product":
         return (
             cls.session
-                .query(Product)
-                .filter_by(name=name.strip().lower())
-                .first()
+            .query(Product)
+            .filter_by(name=name.strip().lower())
+            .first()
+        )
+
+    @classmethod
+    def get_by_id(cls, product_id: int) -> "Product":
+        return (
+            cls.session
+            .query(Product)
+            .filter_by(id=product_id)
+            .first()
         )
 
     @classmethod
     def get_all_products_by_user_id(cls, user_id: int) -> Query:
         return (
             cls.session
-                .query(Product)
-                .filter_by(user_id=user_id)
+            .query(Product)
+            .filter_by(user_id=user_id)
         )
 
     @classmethod

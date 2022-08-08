@@ -2,7 +2,7 @@ from bot.models import TelegramUser, Product
 from telebot import types, TeleBot
 
 from bot.tasks import parse_product
-from db_redis import redis, scheduler
+from db_redis import redis
 from logger import bot_logger, queue_logger
 from rq import Queue
 
